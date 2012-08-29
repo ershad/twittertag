@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>  
+    <title>Twitter tag</title>
+    <%= stylesheet_link_tag    "application", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+
+    <link rel="stylesheet" type="text/css" href="/assets/jqcloud.css" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/assets/jqcloud-1.0.0.min.js"></script>
+    <script type="text/javascript">
+      var word_list = new Array(
+       <% unless @num_counts.empty? %>
+         <% @num_counts.each do |n| %>
+          {text: "<%= n[:num] %>", weight: <%= n[:count] %>}<%= "," if @num_counts.last != n %>
+         <% end %>
+       <% else %>
+          {text: "Enter a twitter handle", weight: 40 }
+       <% end %>
+      );
+      $(document).ready(function() {
+        $("#wordcloud").jQCloud(word_list);
+
+        $('#handle_form').submit(function() {
+          $('#loading_image').show(); // show animation
+          return true; // allow regular form submission
+        });
+      });
+    </script>
+    <style type="text/css">
+      body {
+        background: white;
+        font-family: Helvetica, Arial, sans-serif;
+      }
+      #wordcloud {
+        margin: 30px auto;
+        width: 600px;
+        height: 371px;
+        border: none;
+      }
+      #wordcloud span.w10, #wordcloud span.w9, #wordcloud span.w8, #wordcloud span.w7 {
+        text-shadow: 0px 1px 1px #ccc;
+      }
+      #wordcloud span.w3, #wordcloud span.w2, #wordcloud span.w1 {
+        text-shadow: 0px 1px 1px #fff;
+      }
+      footer {
+        font-size: 13px;
+        color: #aaa;
+        text-align: center;
+        width: 600px;
+        margin: 30px auto;
+        margin-top: 110px;
+        padding: 1em;
+        text-shadow: 0px 1px 1px #fff;
+        border-top: 1px dotted #ddd;
+      }
+      footer a {
+        color: #0af;
+        text-decoration: none;
+      }
+      .form {
+        margin-top: 70px;
+        margin-left: 480px;
+        font-size: 13px;
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wordcloud"></div>
+    <% unless @num_counts.empty? %>
+    <p style="font-size:10px;margin-right:30px;color: #aaa; text-align:right; right: 20px">//Processed <%= @number_of_tweets_processed %> tweet<%= @number_of_tweets_processed > 1 ? "s" : "" %> excluding replies</p>
+    <% end %>
+
+    <form name="input" action="/" method="post" class="form" id="handle_form">
+      Twitter handle:@ <input type="text" name="handle" placeholder="<%= params[:handle] %>"/>
+      <input type="submit" value="Submit" />
+      <img id="loading_image" src="/assets/loader.gif" style="display:none" alt="Loading..."/>
+    </form>
+
+    <footer>
+      By <a href="http://ershadk.com" target="_blank">Ershad</a>
+    </footer>
+  </body>
+</html>
